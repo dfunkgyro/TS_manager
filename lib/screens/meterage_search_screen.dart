@@ -1,8 +1,8 @@
 // screens/meterage_search_screen.dart
 import 'package:flutter/material.dart';
-import 'package:track_sections_app/models/track_data.dart';
-import 'package:track_sections_app/services/data_service.dart';
-import 'package:track_sections_app/widgets/result_card.dart';
+import 'package:track_sections_manager/models/track_data.dart';
+import 'package:track_sections_manager/services/data_service.dart';
+import 'package:track_sections_manager/widgets/result_card.dart';
 
 class MeterageSearchScreen extends StatefulWidget {
   const MeterageSearchScreen({super.key});

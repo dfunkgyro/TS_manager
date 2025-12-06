@@ -1,9 +1,9 @@
 // screens/enhanced_query_screen.dart
 import 'package:flutter/material.dart';
-import 'package:track_sections_app/models/enhanced_track_data.dart';
-import 'package:track_sections_app/services/enhanced_data_service.dart';
-import 'package:track_sections_app/widgets/station_card.dart';
-import 'package:track_sections_app/widgets/network_map.dart';
+import 'package:track_sections_manager/models/enhanced_track_data.dart';
+import 'package:track_sections_manager/services/enhanced_data_service.dart';
+import 'package:track_sections_manager/widgets/station_card.dart';
+import 'package:track_sections_manager/widgets/network_map.dart';
 
 class EnhancedQueryScreen extends StatefulWidget {
   const EnhancedQueryScreen({super.key});
