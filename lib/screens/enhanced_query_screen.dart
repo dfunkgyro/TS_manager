@@ -16,11 +16,48 @@ class _EnhancedQueryScreenState extends State<EnhancedQueryScreen> {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _meterageController = TextEditingController();
   final TextEditingController _lcsController = TextEditingController();
-  
+
   EnhancedQueryResult? _result;
   List<LCSStationMapping> _searchResults = [];
+  List<LCSStationMapping> _lcsCodeSuggestions = [];
+  List<EnhancedTrackSection> _trackSectionSuggestions = [];
   bool _isLoading = false;
   String _activeTab = 'search';
+
+  @override
+  void initState() {
+    super.initState();
+    _lcsController.addListener(_onLcsCodeChanged);
+  }
+
+  @override
+  void dispose() {
+    _lcsController.removeListener(_onLcsCodeChanged);
+    _searchController.dispose();
+    _meterageController.dispose();
+    _lcsController.dispose();
+    super.dispose();
+  }
+
+  void _onLcsCodeChanged() {
+    final query = _lcsController.text.trim();
+    if (query.isEmpty) {
+      setState(() {
+        _lcsCodeSuggestions = [];
+        _trackSectionSuggestions = [];
+      });
+      return;
+    }
+
+    // Real-time partial search
+    final stationResults = EnhancedDataService().searchPartialLcsCode(query);
+    final sectionResults = EnhancedDataService().searchPartialTrackSections(query);
+
+    setState(() {
+      _lcsCodeSuggestions = stationResults.take(10).toList();
+      _trackSectionSuggestions = sectionResults.take(10).toList();
+    });
+  }
 
   void _performSearch() {
     final query = _searchController.text.trim();
@@ -261,9 +298,17 @@ class _EnhancedQueryScreenState extends State<EnhancedQueryScreen> {
                   TextField(
                     controller: _lcsController,
                     decoration: InputDecoration(
-                      labelText: 'Enter LCS Code',
-                      hintText: 'e.g., D011 or M173',
+                      labelText: 'Enter LCS Code (partial match supported)',
+                      hintText: 'e.g., D0, M1, or D011',
                       prefixIcon: const Icon(Icons.qr_code),
+                      suffixIcon: _lcsController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                _lcsController.clear();
+                              },
+                            )
+                          : null,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -284,6 +329,118 @@ class _EnhancedQueryScreenState extends State<EnhancedQueryScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 20),
+
+          // Suggestions list
+          if (_lcsCodeSuggestions.isNotEmpty || _trackSectionSuggestions.isNotEmpty)
+            Expanded(
+              child: Card(
+                elevation: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(4),
+                          topRight: Radius.circular(4),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.lightbulb_outline, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Matching Results (${_lcsCodeSuggestions.length + _trackSectionSuggestions.length})',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          // Station suggestions
+                          if (_lcsCodeSuggestions.isNotEmpty) ...[
+                            const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: Text(
+                                'Stations',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                            ..._lcsCodeSuggestions.map((station) {
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: Colors.blue.shade100,
+                                  child: Text(
+                                    station.lcsCode.substring(0, 1),
+                                    style: TextStyle(color: Colors.blue.shade900),
+                                  ),
+                                ),
+                                title: Text(station.station),
+                                subtitle: Text('${station.lcsCode} • ${station.line}'),
+                                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                                onTap: () {
+                                  _lcsController.text = station.lcsCode;
+                                  _searchByLcs();
+                                },
+                              );
+                            }).toList(),
+                          ],
+
+                          // Track section suggestions
+                          if (_trackSectionSuggestions.isNotEmpty) ...[
+                            const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: Text(
+                                'Track Sections',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                            ..._trackSectionSuggestions.map((section) {
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: Colors.green.shade100,
+                                  child: const Icon(Icons.track_changes, size: 20),
+                                ),
+                                title: Text(section.newShortDescription),
+                                subtitle: Text(
+                                  '${section.lcsCode} • ${section.operatingLine}\n'
+                                  'Meterage: ${section.lcsMeterageStart.toStringAsFixed(1)} - ${section.lcsMeterageEnd.toStringAsFixed(1)}m',
+                                ),
+                                isThreeLine: true,
+                                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                                onTap: () {
+                                  // Navigate to meterage search with this section's midpoint
+                                  final midpoint = (section.lcsMeterageStart + section.lcsMeterageEnd) / 2;
+                                  _meterageController.text = midpoint.toStringAsFixed(1);
+                                  setState(() {
+                                    _activeTab = 'meterage';
+                                  });
+                                  _searchByMeterage();
+                                },
+                              );
+                            }).toList(),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );

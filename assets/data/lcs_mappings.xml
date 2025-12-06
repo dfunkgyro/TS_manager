@@ -1,12 +1,112 @@
-<!-- assets/lcs_mappings.xml -->
 <?xml version="1.0" encoding="UTF-8"?>
 <LCS_Map>
     <!-- DISTRICT LINE — UPMINSTER BRANCH -->
     <Entry><LCS_Code>D011</LCS_Code><Station>Upminster</Station><Line>District Line</Line></Entry>
     <Entry><LCS_Code>D013</LCS_Code><Station>Upminster Bridge</Station><Line>District Line</Line></Entry>
-    <!-- ... include all LCS mappings from your data ... -->
+    <Entry><LCS_Code>D015</LCS_Code><Station>Hornchurch</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D017</LCS_Code><Station>Elm Park</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D019</LCS_Code><Station>Dagenham East</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D023</LCS_Code><Station>Dagenham Heathway</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D025</LCS_Code><Station>Becontree</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D027</LCS_Code><Station>Upney</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D031</LCS_Code><Station>Barking</Station><Line>District Line</Line></Entry>
+
+    <!-- BARKING → EARL'S COURT MAIN LINE -->
+    <Entry><LCS_Code>D033</LCS_Code><Station>East Ham</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D035</LCS_Code><Station>Upton Park</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D037</LCS_Code><Station>Plaistow</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D039</LCS_Code><Station>West Ham</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D043</LCS_Code><Station>Bromley-by-Bow</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D051</LCS_Code><Station>Bow Road</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D053</LCS_Code><Station>Mile End</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D055</LCS_Code><Station>Stepney Green</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D061</LCS_Code><Station>Whitechapel</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D071</LCS_Code><Station>Aldgate East</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D077</LCS_Code><Station>Tower Hill</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D082_D078</LCS_Code><Station>Monument</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D083</LCS_Code><Station>Cannon Street</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D085</LCS_Code><Station>Mansion House</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D091</LCS_Code><Station>Blackfriars</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D093</LCS_Code><Station>Temple</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D096_D094</LCS_Code><Station>Embankment</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D101</LCS_Code><Station>Westminster</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D103</LCS_Code><Station>St. James's Park</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D047</LCS_Code><Station>Victoria</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D107</LCS_Code><Station>Sloane Square</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D109</LCS_Code><Station>South Kensington</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D112_D108</LCS_Code><Station>Gloucester Road</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D172</LCS_Code><Station>Earl's Court</Station><Line>District Line</Line></Entry>
+
+    <!-- EARL'S COURT – EALING BROADWAY BRANCH -->
+    <Entry><LCS_Code>D173</LCS_Code><Station>West Kensington</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D175</LCS_Code><Station>Barons Court</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D177</LCS_Code><Station>Hammersmith</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D179</LCS_Code><Station>Ravenscourt Park</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D183</LCS_Code><Station>Stamford Brook</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D185</LCS_Code><Station>Turnham Green</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D203</LCS_Code><Station>Chiswick Park</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D205</LCS_Code><Station>Acton Town</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D243</LCS_Code><Station>Ealing Common</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D244</LCS_Code><Station>Ealing Broadway</Station><Line>District Line</Line></Entry>
+
+    <!-- EARL'S COURT – WIMBLEDON BRANCH -->
+    <Entry><LCS_Code>D143</LCS_Code><Station>West Brompton</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D153</LCS_Code><Station>Fulham Broadway</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D155</LCS_Code><Station>Parsons Green</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D157</LCS_Code><Station>Putney Bridge</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D163</LCS_Code><Station>East Putney</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D165</LCS_Code><Station>Southfields</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D167</LCS_Code><Station>Wimbledon Park</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D169</LCS_Code><Station>Wimbledon</Station><Line>District Line</Line></Entry>
+
+    <!-- EARL'S COURT – RICHMOND BRANCH -->
+    <Entry><LCS_Code>D193</LCS_Code><Station>Gunnersbury</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D195</LCS_Code><Station>Kew Gardens</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D197</LCS_Code><Station>Richmond</Station><Line>District Line</Line></Entry>
+
+    <!-- CIRCLE LINE -->
+    <Entry><LCS_Code>D119</LCS_Code><Station>Bayswater</Station><Line>Circle Line</Line></Entry>
+    <Entry><LCS_Code>D188_D116</LCS_Code><Station>Notting Hill Gate</Station><Line>Circle Line</Line></Entry>
+    <Entry><LCS_Code>D115</LCS_Code><Station>High Street Kensington</Station><Line>Circle Line</Line></Entry>
+    <Entry><LCS_Code>D137</LCS_Code><Station>Kensington (Olympia)</Station><Line>Circle Line</Line></Entry>
+
+    <!-- METROPOLITAN LINE — UXBRIDGE BRANCH -->
+    <Entry><LCS_Code>P117</LCS_Code><Station>Uxbridge</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>P129</LCS_Code><Station>Hillingdon</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>P113</LCS_Code><Station>Ickenham</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>P109</LCS_Code><Station>Ruislip</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>P107</LCS_Code><Station>Ruislip Manor</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>P105</LCS_Code><Station>Eastcote</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>P103</LCS_Code><Station>Rayners Lane</Station><Line>Metropolitan Line</Line></Entry>
+
+    <!-- RAYNERS LANE → HARROW ON THE HILL -->
+    <Entry><LCS_Code>M073</LCS_Code><Station>North Harrow</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M091</LCS_Code><Station>Harrow-on-the-Hill</Station><Line>Metropolitan Line</Line></Entry>
+
+    <!-- METROPOLITAN LINE — CHESHAM BRANCH -->
+    <Entry><LCS_Code>M031</LCS_Code><Station>Chesham</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M033</LCS_Code><Station>Chalfont & Latimer</Station><Line>Metropolitan Line</Line></Entry>
+
+    <!-- METROPOLITAN LINE — AMERSHAM BRANCH -->
+    <Entry><LCS_Code>M019</LCS_Code><Station>Amersham</Station><Line>Metropolitan Line</Line></Entry>
+
+    <!-- METROPOLITAN LINE — WATFORD BRANCH -->
+    <Entry><LCS_Code>M041</LCS_Code><Station>Watford</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M043</LCS_Code><Station>Croxley</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M063</LCS_Code><Station>Moor Park</Station><Line>Metropolitan Line</Line></Entry>
+
+    <!-- MOOR PARK → HARROW ON THE HILL -->
+    <Entry><LCS_Code>M065</LCS_Code><Station>Northwood</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M067</LCS_Code><Station>Northwood Hills</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M071</LCS_Code><Station>Pinner</Station><Line>Metropolitan Line</Line></Entry>
+
+    <!-- HARROW ON THE HILL → ALDGATE (MAIN LINE) -->
+    <Entry><LCS_Code>M093</LCS_Code><Station>Northwick Park</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>B033</LCS_Code><Station>Kenton</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M095</LCS_Code><Station>Preston Road</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>B093</LCS_Code><Station>Wembley Park</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>B107</LCS_Code><Station>Finchley Road</Station><Line>Metropolitan Line</Line></Entry>
     <Entry><LCS_Code>B077</LCS_Code><Station>Baker Street</Station><Line>Metropolitan Line</Line></Entry>
-    <Entry><LCS_Code>B077</LCS_Code><Station>Baker Street</Station><Line>Hammersmith & City Line</Line></Entry>
     <Entry><LCS_Code>M115</LCS_Code><Station>Great Portland Street</Station><Line>Metropolitan Line</Line></Entry>
     <Entry><LCS_Code>M117</LCS_Code><Station>Euston Square</Station><Line>Metropolitan Line</Line></Entry>
     <Entry><LCS_Code>M118</LCS_Code><Station>King's Cross St Pancras</Station><Line>Metropolitan Line</Line></Entry>
@@ -15,19 +115,20 @@
     <Entry><LCS_Code>M135</LCS_Code><Station>Moorgate</Station><Line>Metropolitan Line</Line></Entry>
     <Entry><LCS_Code>M142_D074</LCS_Code><Station>Liverpool Street</Station><Line>Metropolitan Line</Line></Entry>
     <Entry><LCS_Code>D075</LCS_Code><Station>Aldgate</Station><Line>Metropolitan Line</Line></Entry>
-    
+
     <!-- HAMMERSMITH & CITY LINE -->
-    <Entry><LCS_Code>M173</LCS_Code><Station>Royal Oak</Station><Line>Hammersmith & City Line</Line></Entry>
-    <Entry><LCS_Code>M175</LCS_Code><Station>Westbourne Park</Station><Line>Hammersmith & City Line</Line></Entry>
-    <Entry><LCS_Code>M177</LCS_Code><Station>Ladbroke Grove</Station><Line>Hammersmith & City Line</Line></Entry>
-    <Entry><LCS_Code>M184</LCS_Code><Station>Latimer Road</Station><Line>Hammersmith & City Line</Line></Entry>
-    <Entry><LCS_Code>M183</LCS_Code><Station>Wood Lane</Station><Line>Hammersmith & City Line</Line></Entry>
-    <Entry><LCS_Code>M187</LCS_Code><Station>Goldhawk Road</Station><Line>Hammersmith & City Line</Line></Entry>
-    <Entry><LCS_Code>M188</LCS_Code><Station>Royal Oak</Station><Line>Hammersmith & City Line</Line></Entry>
-    <Entry><LCS_Code>M189</LCS_Code><Station>Hammersmith</Station><Line>Hammersmith & City Line</Line></Entry>
-    
+    <Entry><LCS_Code>M173</LCS_Code><Station>Royal Oak</Station><Line>Hammersmith &amp; City Line</Line></Entry>
+    <Entry><LCS_Code>M175</LCS_Code><Station>Westbourne Park</Station><Line>Hammersmith &amp; City Line</Line></Entry>
+    <Entry><LCS_Code>M177</LCS_Code><Station>Ladbroke Grove</Station><Line>Hammersmith &amp; City Line</Line></Entry>
+    <Entry><LCS_Code>M184</LCS_Code><Station>Latimer Road</Station><Line>Hammersmith &amp; City Line</Line></Entry>
+    <Entry><LCS_Code>M183</LCS_Code><Station>Wood Lane</Station><Line>Hammersmith &amp; City Line</Line></Entry>
+    <Entry><LCS_Code>M187</LCS_Code><Station>Goldhawk Road</Station><Line>Hammersmith &amp; City Line</Line></Entry>
+    <Entry><LCS_Code>M188</LCS_Code><Station>Royal Oak</Station><Line>Hammersmith &amp; City Line</Line></Entry>
+    <Entry><LCS_Code>M189</LCS_Code><Station>Hammersmith</Station><Line>Hammersmith &amp; City Line</Line></Entry>
+
     <!-- PADDINGTON → BAKER STREET SECTION -->
-    <Entry><LCS_Code>M171</LCS_Code><Station>Paddington Suburban</Station><Line>Hammersmith & City Line</Line></Entry>
-    <Entry><LCS_Code>M169</LCS_Code><Station>Edgware Road</Station><Line>Hammersmith & City Line</Line></Entry>
-    <Entry><LCS_Code>B077</LCS_Code><Station>Baker Street</Station><Line>Hammersmith & City Line</Line></Entry>
+    <Entry><LCS_Code>M171</LCS_Code><Station>Paddington Suburban</Station><Line>Hammersmith &amp; City Line</Line></Entry>
+    <Entry><LCS_Code>M169</LCS_Code><Station>Edgware Road</Station><Line>Hammersmith &amp; City Line</Line></Entry>
+    <Entry><LCS_Code>B077</LCS_Code><Station>Baker Street</Station><Line>Hammersmith &amp; City Line</Line></Entry>
+    <Entry><LCS_Code>C101</LCS_Code><Station>Liverpool Street</Station><Line>Circle Line</Line></Entry>
 </LCS_Map>

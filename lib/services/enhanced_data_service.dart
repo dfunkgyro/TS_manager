@@ -257,6 +257,89 @@ class EnhancedDataService {
         .toList();
   }
 
+  /// Search for partial LCS code matches and return shortlist
+  List<LCSStationMapping> searchPartialLcsCode(String partialCode) {
+    if (partialCode.isEmpty) return [];
+
+    final cleanQuery = partialCode.toUpperCase().trim();
+    final results = <LCSStationMapping>[];
+
+    // Exact match first
+    final exactMatches = _stationMappings
+        .where((m) => m.lcsCode.toUpperCase() == cleanQuery)
+        .toList();
+    results.addAll(exactMatches);
+
+    // Starts with match
+    if (results.isEmpty) {
+      final startsWithMatches = _stationMappings
+          .where((m) => m.lcsCode.toUpperCase().startsWith(cleanQuery))
+          .toList();
+      results.addAll(startsWithMatches);
+    }
+
+    // Contains match (broader search)
+    if (results.isEmpty || results.length < 5) {
+      final containsMatches = _stationMappings
+          .where((m) =>
+              m.lcsCode.toUpperCase().contains(cleanQuery) &&
+              !results.contains(m))
+          .toList();
+      results.addAll(containsMatches);
+    }
+
+    // Sort by relevance: exact > starts with > contains
+    results.sort((a, b) {
+      final aCode = a.lcsCode.toUpperCase();
+      final bCode = b.lcsCode.toUpperCase();
+
+      if (aCode == cleanQuery && bCode != cleanQuery) return -1;
+      if (aCode != cleanQuery && bCode == cleanQuery) return 1;
+
+      if (aCode.startsWith(cleanQuery) && !bCode.startsWith(cleanQuery)) return -1;
+      if (!aCode.startsWith(cleanQuery) && bCode.startsWith(cleanQuery)) return 1;
+
+      return aCode.compareTo(bCode);
+    });
+
+    return results;
+  }
+
+  /// Get all track sections matching a partial LCS code
+  List<EnhancedTrackSection> searchPartialTrackSections(String partialCode) {
+    if (partialCode.isEmpty) return [];
+
+    final cleanQuery = partialCode.toUpperCase().trim();
+    final results = <EnhancedTrackSection>[];
+
+    // Search in enhanced sections
+    results.addAll(_enhancedSections.where((section) {
+      final lcsCode = section.lcsCode.toUpperCase();
+      final legacyCode = section.legacyLcsCode.toUpperCase();
+
+      return lcsCode.contains(cleanQuery) || legacyCode.contains(cleanQuery);
+    }));
+
+    // Sort by relevance
+    results.sort((a, b) {
+      final aExact = a.lcsCode.toUpperCase() == cleanQuery;
+      final bExact = b.lcsCode.toUpperCase() == cleanQuery;
+
+      if (aExact && !bExact) return -1;
+      if (!aExact && bExact) return 1;
+
+      final aStarts = a.lcsCode.toUpperCase().startsWith(cleanQuery);
+      final bStarts = b.lcsCode.toUpperCase().startsWith(cleanQuery);
+
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+
+      return a.lcsMeterageStart.compareTo(b.lcsMeterageStart);
+    });
+
+    return results;
+  }
+
   List<LCSStationMapping> getStationsOnLine(String line) {
     return _stationMappings
         .where((mapping) => mapping.line == line)
