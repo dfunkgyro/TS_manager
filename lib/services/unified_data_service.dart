@@ -472,8 +472,69 @@ class UnifiedDataService {
 
   /// Import data from JSON
   Future<void> importData(Map<String, dynamic> data) async {
-    // This would merge imported data with existing data
-    // Implementation depends on merge strategy
+    try {
+      // Import user station mappings
+      if (data.containsKey('station_mappings')) {
+        final mappingsJson = data['station_mappings'] as List<dynamic>;
+        for (final mappingData in mappingsJson) {
+          final mapping = LCSStationMapping.fromJson(mappingData as Map<String, dynamic>);
+          if (!_userStationMappings.any((m) => m.lcsCode == mapping.lcsCode)) {
+            _userStationMappings.add(mapping);
+          }
+        }
+      }
+
+      // Import user track sections
+      if (data.containsKey('track_sections')) {
+        final sectionsJson = data['track_sections'] as List<dynamic>;
+        for (final sectionData in sectionsJson) {
+          final section = EnhancedTrackSection.fromJson(sectionData as Map<String, dynamic>);
+          if (!_userTrackSections.any((s) => s.trackSectionId == section.trackSectionId)) {
+            _userTrackSections.add(section);
+          }
+        }
+      }
+
+      // Import user LCS to track sections mappings
+      if (data.containsKey('user_lcs_to_track_sections')) {
+        final mappingsData = data['user_lcs_to_track_sections'] as Map<String, dynamic>;
+        for (final entry in mappingsData.entries) {
+          final lcsCode = entry.key;
+          final tsIds = (entry.value as List).cast<int>();
+          _userLcsToTrackSections[lcsCode] = tsIds;
+        }
+      }
+
+      // Rebuild indices and save
+      _buildIndices();
+      await _saveUserData();
+
+      print('✓ Data imported successfully');
+    } catch (e) {
+      print('Error importing data: $e');
+      rethrow;
+    }
+  }
+
+  /// Get all data including user additions
+  Map<String, dynamic> getAllDataWithUserAdditions() {
+    return {
+      'station_mappings': allStationMappings.map((m) => m.toJson()).toList(),
+      'track_sections': allTrackSections.map((s) => s.toJson()).toList(),
+      'user_lcs_to_track_sections': _userLcsToTrackSections,
+      'lcs_codes': allLcsCodes,
+      'lines': allLines,
+      'stations': allStations,
+    };
+  }
+
+  /// Clear all user data
+  Future<void> clearUserData() async {
+    _userStationMappings.clear();
+    _userTrackSections.clear();
+    _userLcsToTrackSections.clear();
+    _buildIndices();
+    await _saveUserData();
   }
 }
 
