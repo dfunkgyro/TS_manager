@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:csv/csv.dart';
 import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:excel/excel.dart' as excel_lib;
 import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
@@ -132,8 +132,8 @@ class ExportService {
 
       // Define header style
       var headerStyle = excel_lib.CellStyle(
-        backgroundColorHex: '#1976D2',
-        fontColorHex: '#FFFFFF',
+        backgroundColorHex: excel_lib.ExcelColor.fromHexString('#1976D2'),
+        fontColorHex: excel_lib.ExcelColor.fromHexString('#FFFFFF'),
         bold: true,
       );
 
@@ -187,7 +187,7 @@ class ExportService {
                 columnIndex: j,
                 rowIndex: i + 1,
               ))
-              .value = rowData[j];
+              .value = rowData[j] as dynamic;
         }
       }
 

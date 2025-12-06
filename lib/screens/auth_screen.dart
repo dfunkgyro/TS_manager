@@ -1,6 +1,5 @@
 // screens/auth_screen.dart
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:track_sections_manager/services/supabase_service.dart';
 import 'package:track_sections_manager/screens/home_screen.dart';
 

@@ -2,6 +2,19 @@
 -- This schema includes tables for track sections, stations, user data, and search history
 
 -- ============================================
+-- 0. CLEANUP (Drop existing tables to ensure schema matches)
+-- ============================================
+DROP VIEW IF EXISTS public.maintenance_summary_by_line CASCADE;
+DROP VIEW IF EXISTS public.track_sections_with_stations CASCADE;
+DROP TABLE IF EXISTS public.exports CASCADE;
+DROP TABLE IF EXISTS public.maintenance_records CASCADE;
+DROP TABLE IF EXISTS public.favorites CASCADE;
+DROP TABLE IF EXISTS public.search_history CASCADE;
+DROP TABLE IF EXISTS public.user_profiles CASCADE;
+DROP TABLE IF EXISTS public.stations CASCADE;
+DROP TABLE IF EXISTS public.track_sections CASCADE;
+
+-- ============================================
 -- 1. TRACK SECTIONS TABLE
 -- ============================================
 CREATE TABLE IF NOT EXISTS public.track_sections (

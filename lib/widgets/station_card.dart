@@ -83,9 +83,9 @@ class StationCard extends StatelessWidget {
   Color _getLineColor(String line) {
     const lineColors = {
       'District Line': Colors.green,
-      'Circle Line': Colors.yellow.shade700,
+      'Circle Line': Color.fromRGBO(251, 192, 45, 1),
       'Metropolitan Line': Colors.purple,
-      'Hammersmith & City Line': Colors.pink.shade300,
+      'Hammersmith & City Line': Color.fromRGBO(240, 98, 146, 1),
     };
     return lineColors[line] ?? Colors.blue;
   }

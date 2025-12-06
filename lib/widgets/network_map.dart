@@ -70,10 +70,10 @@ class NetworkMap extends StatelessWidget {
 
   Color _getLineColor(String line) {
     const lineColors = {
-      'District Line': Colors.green.shade100,
-      'Circle Line': Colors.yellow.shade100,
-      'Metropolitan Line': Colors.purple.shade100,
-      'Hammersmith & City Line': Colors.pink.shade100,
+      'District Line': Color.fromRGBO(200, 230, 201, 1),
+      'Circle Line': Color.fromRGBO(255, 249, 196, 1),
+      'Metropolitan Line': Color.fromRGBO(225, 190, 231, 1),
+      'Hammersmith & City Line': Color.fromRGBO(248, 187, 208, 1),
     };
     return lineColors[line] ?? Colors.blue.shade100;
   }
