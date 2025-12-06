@@ -1,6 +1,6 @@
 // screens/home_screen.dart
 import 'package:flutter/material.dart';
-import 'package:track_sections_app/widgets/navigation_card.dart';
+import 'package:track_sections_manager/widgets/navigation_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
