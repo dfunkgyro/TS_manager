@@ -1,0 +1,29 @@
+[
+  {
+    "code": "M189",
+    "name": "Royal Oak",
+    "line": "Metropolitan Line",
+    "meterage": 15125.0,
+    "latitude": 51.5191,
+    "longitude": -0.1880,
+    "zone": 2
+  },
+  {
+    "code": "D011",
+    "name": "Upminster",
+    "line": "District Line",
+    "meterage": 10075.0,
+    "latitude": 51.5590,
+    "longitude": 0.2509,
+    "zone": 6
+  },
+  {
+    "code": "C055",
+    "name": "Baker Street",
+    "line": "Circle Line",
+    "meterage": 20150.0,
+    "latitude": 51.5226,
+    "longitude": -0.1571,
+    "zone": 1
+  }
+]
