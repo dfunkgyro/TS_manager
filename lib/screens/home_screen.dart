@@ -92,6 +92,15 @@ class HomeScreen extends StatelessWidget {
                       },
                     ),
                     NavigationCard(
+                      title: 'LCS/TS Finder',
+                      subtitle: 'Find by LCS or Platform',
+                      icon: Icons.find_in_page,
+                      color: Colors.teal,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/enhanced-lcs-ts-finder');
+                      },
+                    ),
+                    NavigationCard(
                       title: 'Data Export',
                       subtitle: 'Export results',
                       icon: Icons.download,

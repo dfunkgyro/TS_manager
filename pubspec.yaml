@@ -95,6 +95,7 @@ dependencies:
   url_launcher: ^6.3.2
   share_plus: ^12.0.1
   clipboard: ^2.0.2
+  flutter_dotenv: ^5.1.0
   image_picker: ^1.2.1
   camera: ^0.11.3
   image: ^4.0.0
@@ -132,3 +133,10 @@ flutter:
     - assets/data/track_data.json
     - assets/data/lcs_mappings.xml
     - assets/data/station_coordinates.json
+    # LCS/TS Data Files (will be generated from Excel)
+    - assets/data/lcs.json
+    - assets/data/ts.json
+    - assets/data/platform_ts.json
+    - assets/data/comprehensive_track_sections.json
+    # Environment Configuration
+    - assets/.env

@@ -56,8 +56,7 @@ PODS:
     - GTMSessionFetcher/Core
   - location (0.0.1):
     - FlutterMacOS
-  - mobile_scanner (7.0.0):
-    - Flutter
+  - mobile_scanner (5.2.3):
     - FlutterMacOS
   - ObjectBox (5.1.0)
   - objectbox_flutter_libs (0.0.1):
@@ -96,7 +95,7 @@ DEPENDENCIES:
   - geolocator_apple (from `Flutter/ephemeral/.symlinks/plugins/geolocator_apple/darwin`)
   - google_sign_in_ios (from `Flutter/ephemeral/.symlinks/plugins/google_sign_in_ios/darwin`)
   - location (from `Flutter/ephemeral/.symlinks/plugins/location/macos`)
-  - mobile_scanner (from `Flutter/ephemeral/.symlinks/plugins/mobile_scanner/darwin`)
+  - mobile_scanner (from `Flutter/ephemeral/.symlinks/plugins/mobile_scanner/macos`)
   - objectbox_flutter_libs (from `Flutter/ephemeral/.symlinks/plugins/objectbox_flutter_libs/macos`)
   - open_file_mac (from `Flutter/ephemeral/.symlinks/plugins/open_file_mac/macos`)
   - package_info_plus (from `Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos`)
@@ -142,7 +141,7 @@ EXTERNAL SOURCES:
   location:
     :path: Flutter/ephemeral/.symlinks/plugins/location/macos
   mobile_scanner:
-    :path: Flutter/ephemeral/.symlinks/plugins/mobile_scanner/darwin
+    :path: Flutter/ephemeral/.symlinks/plugins/mobile_scanner/macos
   objectbox_flutter_libs:
     :path: Flutter/ephemeral/.symlinks/plugins/objectbox_flutter_libs/macos
   open_file_mac:
@@ -180,7 +179,7 @@ SPEC CHECKSUMS:
   GTMAppAuth: 217a876b249c3c585a54fd6f73e6b58c4f5c4238
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   location: 7cdb0665bd6577d382b0a343acdadbcb7f964775
-  mobile_scanner: 77265f3dc8d580810e91849d4a0811a90467ed5e
+  mobile_scanner: 0a05256215b047af27b9495db3b77640055e8824
   ObjectBox: 2d7fbf8cc94967474a6fa1d1b82df29042ba96f3
   objectbox_flutter_libs: 2b86a34dd0ab47350d48a4e29e4b5e16bb11187e
   open_file_mac: 0e554648e2a87ce59e9438e3e5ca3e552e90d89a
