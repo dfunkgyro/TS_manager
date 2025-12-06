@@ -1,6 +1,8 @@
 // models/enhanced_track_data.dart
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'track_data.dart';
 
 enum LineType { DISTRICT, CIRCLE, METROPOLITAN, HAMMERSMITH_CITY }
 enum TrackDirection { EASTBOUND, WESTBOUND, NORTHBOUND, SOUTHBOUND, INNER_RAIL, OUTER_RAIL }

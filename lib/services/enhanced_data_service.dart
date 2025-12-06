@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:xml/xml.dart';
 import '../models/enhanced_track_data.dart';
 import '../models/track_data.dart';
+import 'data_service.dart';
 
 class EnhancedDataService {
   static final EnhancedDataService _instance = EnhancedDataService._internal();
@@ -51,13 +52,19 @@ class EnhancedDataService {
       LCSStationMapping? mapping;
       
       // Try exact LCS code match first
-      mapping = _stationMappings.firstWhere(
-        (m) => m.lcsCode == section.lcsCode,
-        orElse: () => _stationMappings.firstWhere(
-          (m) => _doesLcsMatch(section.lcsCode, m.lcsCode),
-          orElse: () => _findMappingByStationName(section),
-        ),
-      );
+      try {
+        mapping = _stationMappings.firstWhere(
+          (m) => m.lcsCode == section.lcsCode,
+        );
+      } catch (e) {
+        try {
+          mapping = _stationMappings.firstWhere(
+            (m) => _doesLcsMatch(section.lcsCode, m.lcsCode),
+          );
+        } catch (e) {
+          mapping = _findMappingByStationName(section);
+        }
+      }
       
       return EnhancedTrackSection.fromTrackSection(section, mapping);
     }).toList();
@@ -164,6 +171,7 @@ class EnhancedDataService {
       distanceToNearestStation: minStationDistance,
       nearbyStations: nearbyStations,
       nearbySections: nearbySections,
+      queryTimestamp: DateTime.now(),
     );
   }
 
@@ -194,9 +202,10 @@ class EnhancedDataService {
         return EnhancedQueryResult(
           inputMeterage: 0,
           inputLcsCode: lcsCode,
+          queryTimestamp: DateTime.now(),
         );
       }
-      
+
       final section = fuzzySections.first;
       return EnhancedQueryResult(
         nearestSection: section,
@@ -204,6 +213,7 @@ class EnhancedDataService {
         inputMeterage: section.lcsMeterageStart,
         inputLcsCode: lcsCode,
         distanceToNearestStation: 0,
+        queryTimestamp: DateTime.now(),
       );
     }
 
@@ -237,6 +247,7 @@ class EnhancedDataService {
       distanceToNearestStation: 0,
       nearbyStations: nearbyStations,
       nearbySections: sections,
+      queryTimestamp: DateTime.now(),
     );
   }
 
