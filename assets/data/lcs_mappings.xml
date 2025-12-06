@@ -1,0 +1,33 @@
+<!-- assets/lcs_mappings.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<LCS_Map>
+    <!-- DISTRICT LINE — UPMINSTER BRANCH -->
+    <Entry><LCS_Code>D011</LCS_Code><Station>Upminster</Station><Line>District Line</Line></Entry>
+    <Entry><LCS_Code>D013</LCS_Code><Station>Upminster Bridge</Station><Line>District Line</Line></Entry>
+    <!-- ... include all LCS mappings from your data ... -->
+    <Entry><LCS_Code>B077</LCS_Code><Station>Baker Street</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>B077</LCS_Code><Station>Baker Street</Station><Line>Hammersmith & City Line</Line></Entry>
+    <Entry><LCS_Code>M115</LCS_Code><Station>Great Portland Street</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M117</LCS_Code><Station>Euston Square</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M118</LCS_Code><Station>King's Cross St Pancras</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M123</LCS_Code><Station>Farringdon</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M133</LCS_Code><Station>Barbican</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M135</LCS_Code><Station>Moorgate</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>M142_D074</LCS_Code><Station>Liverpool Street</Station><Line>Metropolitan Line</Line></Entry>
+    <Entry><LCS_Code>D075</LCS_Code><Station>Aldgate</Station><Line>Metropolitan Line</Line></Entry>
+    
+    <!-- HAMMERSMITH & CITY LINE -->
+    <Entry><LCS_Code>M173</LCS_Code><Station>Royal Oak</Station><Line>Hammersmith & City Line</Line></Entry>
+    <Entry><LCS_Code>M175</LCS_Code><Station>Westbourne Park</Station><Line>Hammersmith & City Line</Line></Entry>
+    <Entry><LCS_Code>M177</LCS_Code><Station>Ladbroke Grove</Station><Line>Hammersmith & City Line</Line></Entry>
+    <Entry><LCS_Code>M184</LCS_Code><Station>Latimer Road</Station><Line>Hammersmith & City Line</Line></Entry>
+    <Entry><LCS_Code>M183</LCS_Code><Station>Wood Lane</Station><Line>Hammersmith & City Line</Line></Entry>
+    <Entry><LCS_Code>M187</LCS_Code><Station>Goldhawk Road</Station><Line>Hammersmith & City Line</Line></Entry>
+    <Entry><LCS_Code>M188</LCS_Code><Station>Royal Oak</Station><Line>Hammersmith & City Line</Line></Entry>
+    <Entry><LCS_Code>M189</LCS_Code><Station>Hammersmith</Station><Line>Hammersmith & City Line</Line></Entry>
+    
+    <!-- PADDINGTON → BAKER STREET SECTION -->
+    <Entry><LCS_Code>M171</LCS_Code><Station>Paddington Suburban</Station><Line>Hammersmith & City Line</Line></Entry>
+    <Entry><LCS_Code>M169</LCS_Code><Station>Edgware Road</Station><Line>Hammersmith & City Line</Line></Entry>
+    <Entry><LCS_Code>B077</LCS_Code><Station>Baker Street</Station><Line>Hammersmith & City Line</Line></Entry>
+</LCS_Map>
