@@ -158,7 +158,7 @@ class ExportService {
         var cell = sheet.cell(
           excel_lib.CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0),
         );
-        cell.value = headers[i];
+        cell.value = excel_lib.TextCellValue(headers[i]);
         cell.cellStyle = headerStyle;
       }
 
@@ -182,12 +182,18 @@ class ExportService {
         ];
 
         for (var j = 0; j < rowData.length; j++) {
-          sheet
-              .cell(excel_lib.CellIndex.indexByColumnRow(
-                columnIndex: j,
-                rowIndex: i + 1,
-              ))
-              .value = rowData[j] as dynamic;
+          final cellValue = rowData[j];
+          final cell = sheet.cell(excel_lib.CellIndex.indexByColumnRow(
+            columnIndex: j,
+            rowIndex: i + 1,
+          ));
+
+          // Wrap value in appropriate CellValue type
+          if (cellValue is num) {
+            cell.value = excel_lib.DoubleCellValue(cellValue.toDouble());
+          } else {
+            cell.value = excel_lib.TextCellValue(cellValue.toString());
+          }
         }
       }
 

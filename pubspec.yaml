@@ -128,44 +128,7 @@ flutter:
 
   # Assets Configuration
   assets:
-    - assets/images/
-    - assets/animations/
-    - assets/sounds/
-    - assets/fonts/
-    - assets/locales/
-    
     # Data Files
     - assets/data/track_data.json
     - assets/data/lcs_mappings.xml
     - assets/data/station_coordinates.json
-    - assets/data/line_maps/
-    - assets/data/sample_exports/
-    
-    # Icons
-    - assets/icons/
-
-  # Fonts Configuration
-  fonts:
-    - family: Roboto
-      fonts:
-        - asset: assets/fonts/Roboto/Roboto-Regular.ttf
-        - asset: assets/fonts/Roboto/Roboto-Italic.ttf
-          style: italic
-        - asset: assets/fonts/Roboto/Roboto-Bold.ttf
-          weight: 700
-        - asset: assets/fonts/Roboto/Roboto-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Roboto/Roboto-Light.ttf
-          weight: 300
-
-    - family: Inter
-      fonts:
-        - asset: assets/fonts/Inter/Inter-Regular.ttf
-        - asset: assets/fonts/Inter/Inter-Bold.ttf
-          weight: 700
-
-    - family: Railway
-      fonts:
-        - asset: assets/fonts/Railway/Railway-Regular.ttf
-        - asset: assets/fonts/Railway/Railway-Bold.ttf
-          weight: 700
