@@ -100,27 +100,68 @@ class EnhancedDataService {
   }
 
   EnhancedQueryResult enhancedSearchByMeterage(double meterage, {double radius = 100}) {
-    // Find containing sections
+    // Check if meterage is within any valid section
     final containingSections = _enhancedSections
         .where((section) => section.isWithinMeterage(meterage))
+        .toList();
+
+    // Smart chainage correction
+    bool chainageCorrected = false;
+    double? originalMeterage;
+    double? correctedMeterage;
+    String? correctionReason;
+    double searchMeterage = meterage;
+
+    // If no containing sections, find the nearest and correct the chainage
+    if (containingSections.isEmpty && _enhancedSections.isNotEmpty) {
+      double minDistance = double.infinity;
+      EnhancedTrackSection? nearestForCorrection;
+
+      for (var section in _enhancedSections) {
+        final distance = section.calculateDistanceTo(meterage);
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestForCorrection = section;
+        }
+      }
+
+      if (nearestForCorrection != null && minDistance > 1.0) {
+        // Chainage is incorrect, correct it to the nearest section's midpoint
+        chainageCorrected = true;
+        originalMeterage = meterage;
+        correctedMeterage = (nearestForCorrection.lcsMeterageStart +
+                            nearestForCorrection.lcsMeterageEnd) / 2;
+        searchMeterage = correctedMeterage;
+
+        if (minDistance > 1000) {
+          correctionReason = 'Input chainage was ${minDistance.toStringAsFixed(0)}m away from nearest track section';
+        } else {
+          correctionReason = 'Input chainage was ${minDistance.toStringAsFixed(1)}m outside valid track sections';
+        }
+      }
+    }
+
+    // Now perform search with the corrected meterage
+    final validContainingSections = _enhancedSections
+        .where((section) => section.isWithinMeterage(searchMeterage))
         .toList();
 
     // Find nearest station
     LCSStationMapping? nearestStation;
     double minStationDistance = double.infinity;
-    
+
     for (var mapping in _stationMappings) {
       // Find corresponding sections for this station
       final stationSections = _enhancedSections
           .where((section) => section.stationMapping?.lcsCode == mapping.lcsCode)
           .toList();
-      
+
       if (stationSections.isNotEmpty) {
         final avgMeterage = stationSections
             .map((s) => (s.lcsMeterageStart + s.lcsMeterageEnd) / 2)
             .reduce((a, b) => a + b) / stationSections.length;
-        
-        final distance = (avgMeterage - meterage).abs();
+
+        final distance = (avgMeterage - searchMeterage).abs();
         if (distance < minStationDistance) {
           minStationDistance = distance;
           nearestStation = mapping;
@@ -133,30 +174,30 @@ class EnhancedDataService {
       final stationSections = _enhancedSections
           .where((section) => section.stationMapping?.lcsCode == mapping.lcsCode)
           .toList();
-      
+
       if (stationSections.isEmpty) return false;
-      
+
       final avgMeterage = stationSections
           .map((s) => (s.lcsMeterageStart + s.lcsMeterageEnd) / 2)
           .reduce((a, b) => a + b) / stationSections.length;
-      
-      return (avgMeterage - meterage).abs() <= radius;
+
+      return (avgMeterage - searchMeterage).abs() <= radius;
     }).toList();
 
     // Find nearby sections
     final nearbySections = _enhancedSections.where((section) {
-      final distance = section.calculateDistanceTo(meterage);
+      final distance = section.calculateDistanceTo(searchMeterage);
       return distance <= radius;
     }).toList();
 
     EnhancedTrackSection? nearestSection;
-    if (containingSections.isNotEmpty) {
-      nearestSection = containingSections.first;
+    if (validContainingSections.isNotEmpty) {
+      nearestSection = validContainingSections.first;
     } else {
       // Find nearest section
       double minSectionDistance = double.infinity;
       for (var section in _enhancedSections) {
-        final distance = section.calculateDistanceTo(meterage);
+        final distance = section.calculateDistanceTo(searchMeterage);
         if (distance < minSectionDistance) {
           minSectionDistance = distance;
           nearestSection = section;
@@ -172,6 +213,10 @@ class EnhancedDataService {
       nearbyStations: nearbyStations,
       nearbySections: nearbySections,
       queryTimestamp: DateTime.now(),
+      chainageCorrected: chainageCorrected,
+      originalMeterage: originalMeterage,
+      correctedMeterage: correctedMeterage,
+      correctionReason: correctionReason,
     );
   }
 

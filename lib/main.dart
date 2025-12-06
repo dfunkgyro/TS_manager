@@ -8,6 +8,7 @@ import 'package:track_sections_manager/screens/meterage_search_screen.dart';
 import 'package:track_sections_manager/screens/lcs_search_screen.dart';
 import 'package:track_sections_manager/screens/auth_screen.dart';
 import 'package:track_sections_manager/screens/enhanced_query_screen.dart';
+import 'package:track_sections_manager/screens/data_management_screen.dart';
 import 'package:track_sections_manager/services/data_service.dart';
 import 'package:track_sections_manager/services/enhanced_data_service.dart';
 import 'package:track_sections_manager/services/supabase_service.dart';
@@ -129,6 +130,7 @@ class TrackSectionsApp extends StatelessWidget {
         '/enhanced-query': (context) => const EnhancedQueryScreen(),
         '/meterage': (context) => const MeterageSearchScreen(),
         '/lcs': (context) => const LCSSearchScreen(),
+        '/data-management': (context) => const DataManagementScreen(),
       },
       debugShowCheckedModeBanner: false,
     );

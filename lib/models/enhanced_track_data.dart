@@ -387,6 +387,12 @@ class EnhancedQueryResult {
   final List<String> suggestedActions;
   final DateTime queryTimestamp;
 
+  // Smart chainage correction fields
+  final bool chainageCorrected;
+  final double? originalMeterage;
+  final double? correctedMeterage;
+  final String? correctionReason;
+
   const EnhancedQueryResult({
     this.nearestSection,
     this.nearestStation,
@@ -398,6 +404,10 @@ class EnhancedQueryResult {
     this.networkConnections,
     this.suggestedActions = const [],
     required this.queryTimestamp,
+    this.chainageCorrected = false,
+    this.originalMeterage,
+    this.correctedMeterage,
+    this.correctionReason,
   });
 
   factory EnhancedQueryResult.fromBasic(
