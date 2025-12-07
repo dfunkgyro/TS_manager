@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:track_sections_manager/services/unified_data_service.dart';
+import 'package:track_sections_manager/services/activity_logger.dart';
 
 /// AI Service for enhanced search and data connections
 /// Supports both OpenAI and DeepSeek AI
@@ -26,37 +27,63 @@ class AIService {
 
   /// Initialize AI service with API keys from .env
   Future<void> initialize() async {
+    final logger = ActivityLogger();
+
     try {
+      logger.log('Initializing AI Service...', category: 'AI', level: LogLevel.info);
+
       await dotenv.load(fileName: "assets/.env");
+      logger.log('.env file loaded successfully', category: 'AI', level: LogLevel.success);
+
       _openAiKey = dotenv.env['OPENAI_API_KEY'];
       _deepseekKey = dotenv.env['DEEPSEEK_API_KEY'];
+
+      logger.log('API Keys found', category: 'AI', data: {
+        'openai_present': _openAiKey != null && _openAiKey!.isNotEmpty,
+        'openai_valid': _openAiKey != null && !_openAiKey!.contains('your_'),
+        'deepseek_present': _deepseekKey != null && _deepseekKey!.isNotEmpty,
+        'deepseek_valid': _deepseekKey != null && !_deepseekKey!.contains('your_'),
+      });
 
       // Try OpenAI first, then DeepSeek
       if (_openAiKey != null && _openAiKey!.isNotEmpty && !_openAiKey!.contains('your_')) {
         _provider = 'openai';
+        logger.log('Attempting OpenAI connection...', category: 'AI');
         await _testConnection();
-        if (_isConnected) return;
+        if (_isConnected) {
+          logger.log('OpenAI connected successfully!', category: 'AI', level: LogLevel.success);
+          return;
+        }
       }
 
       if (_deepseekKey != null && _deepseekKey!.isNotEmpty && !_deepseekKey!.contains('your_')) {
         _provider = 'deepseek';
+        logger.log('Attempting DeepSeek connection...', category: 'AI');
         await _testConnection();
-        if (_isConnected) return;
+        if (_isConnected) {
+          logger.log('DeepSeek connected successfully!', category: 'AI', level: LogLevel.success);
+          return;
+        }
       }
 
       _lastError = 'No valid AI API keys found in .env file';
       _isConnected = false;
       _provider = 'none';
+      logger.log(_lastError!, category: 'AI', level: LogLevel.warning);
     } catch (e) {
       _lastError = 'Failed to load .env file: $e';
       _isConnected = false;
       _provider = 'none';
+      logger.log(_lastError!, category: 'AI', level: LogLevel.error, data: {'error': e.toString()});
     }
   }
 
   Future<void> _testConnection() async {
+    final logger = ActivityLogger();
+
     try {
       if (_provider == 'openai') {
+        logger.log('Testing OpenAI connection...', category: 'AI');
         final response = await http.get(
           Uri.parse('https://api.openai.com/v1/models'),
           headers: {
@@ -67,8 +94,15 @@ class AIService {
         _isConnected = response.statusCode == 200;
         if (!_isConnected) {
           _lastError = 'OpenAI API returned status ${response.statusCode}';
+          logger.log(_lastError!, category: 'AI', level: LogLevel.error, data: {
+            'status_code': response.statusCode,
+            'response': response.body.substring(0, response.body.length > 200 ? 200 : response.body.length),
+          });
+        } else {
+          logger.log('OpenAI connection test passed', category: 'AI', level: LogLevel.success);
         }
       } else if (_provider == 'deepseek') {
+        logger.log('Testing DeepSeek connection...', category: 'AI');
         final response = await http.get(
           Uri.parse('https://api.deepseek.com/models'),
           headers: {
@@ -79,11 +113,18 @@ class AIService {
         _isConnected = response.statusCode == 200;
         if (!_isConnected) {
           _lastError = 'DeepSeek API returned status ${response.statusCode}';
+          logger.log(_lastError!, category: 'AI', level: LogLevel.error, data: {
+            'status_code': response.statusCode,
+            'response': response.body.substring(0, response.body.length > 200 ? 200 : response.body.length),
+          });
+        } else {
+          logger.log('DeepSeek connection test passed', category: 'AI', level: LogLevel.success);
         }
       }
     } catch (e) {
       _isConnected = false;
       _lastError = 'Connection test failed: $e';
+      logger.log(_lastError!, category: 'AI', level: LogLevel.error, data: {'error': e.toString()});
     }
   }
 

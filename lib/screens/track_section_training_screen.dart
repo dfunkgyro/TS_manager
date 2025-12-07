@@ -37,6 +37,17 @@ class _TrackSectionTrainingScreenState extends State<TrackSectionTrainingScreen>
   final TextEditingController _descriptionController = TextEditingController();
   String? _selectedEditLine;
 
+  // Add new track section mode
+  final TextEditingController _newTsIdController = TextEditingController();
+  final TextEditingController _newLcsController = TextEditingController();
+  final TextEditingController _newStationController = TextEditingController();
+  final TextEditingController _newChainageController = TextEditingController();
+  final TextEditingController _newMeterageController = TextEditingController();
+  final TextEditingController _newPlatformController = TextEditingController();
+  final TextEditingController _newDescriptionController = TextEditingController();
+  String? _newSelectedLine;
+  double? _calculatedChainage;
+
   @override
   void initState() {
     super.initState();
@@ -378,6 +389,464 @@ class _TrackSectionTrainingScreenState extends State<TrackSectionTrainingScreen>
     }
   }
 
+  // ============ ADD NEW TRACK SECTION FUNCTIONALITY ============
+
+  Future<void> _addNewTrackSection() async {
+    // Reset form controllers
+    _newTsIdController.clear();
+    _newLcsController.clear();
+    _newStationController.clear();
+    _newChainageController.clear();
+    _newMeterageController.clear();
+    _newPlatformController.clear();
+    _newDescriptionController.clear();
+    _newSelectedLine = null;
+    _calculatedChainage = null;
+
+    await showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.add_circle, color: Colors.green),
+              SizedBox(width: 8),
+              Text('Add New Track Section'),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: SizedBox(
+              width: 600,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Enter track section details below. You can provide either chainage or LCS code + meterage.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Track Section ID (5 digits)
+                  TextField(
+                    controller: _newTsIdController,
+                    decoration: const InputDecoration(
+                      labelText: 'Track Section ID *',
+                      prefixIcon: Icon(Icons.numbers),
+                      border: OutlineInputBorder(),
+                      helperText: 'Must be 5 digits (e.g., 10501)',
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(5),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // LCS Code
+                  TextField(
+                    controller: _newLcsController,
+                    decoration: const InputDecoration(
+                      labelText: 'LCS Code *',
+                      prefixIcon: Icon(Icons.code),
+                      border: OutlineInputBorder(),
+                      helperText: 'e.g., M187, BAK/A, VIC/E',
+                    ),
+                    onChanged: (value) {
+                      // Recalculate chainage if meterage is provided
+                      if (_newMeterageController.text.isNotEmpty) {
+                        setDialogState(() {
+                          _calculateChainageFromMeterage(value, _newMeterageController.text);
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Station/Location
+                  TextField(
+                    controller: _newStationController,
+                    decoration: const InputDecoration(
+                      labelText: 'Location/Station Name *',
+                      prefixIcon: Icon(Icons.location_on),
+                      border: OutlineInputBorder(),
+                      helperText: 'e.g., Victoria, Goldhawk Road',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Line
+                  DropdownButtonFormField<String>(
+                    value: _newSelectedLine,
+                    decoration: const InputDecoration(
+                      labelText: 'Line *',
+                      prefixIcon: Icon(Icons.train),
+                      border: OutlineInputBorder(),
+                    ),
+                    items: _dataService.allLines.map((line) => DropdownMenuItem(
+                      value: line,
+                      child: Text(line),
+                    )).toList(),
+                    onChanged: (value) => setDialogState(() => _newSelectedLine = value),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Platform Number (optional)
+                  TextField(
+                    controller: _newPlatformController,
+                    decoration: const InputDecoration(
+                      labelText: 'Platform Number (optional)',
+                      prefixIcon: Icon(Icons.view_list),
+                      border: OutlineInputBorder(),
+                      helperText: 'e.g., 1, 2, 3, etc.',
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 16),
+
+                  const Divider(thickness: 2),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Position Information',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const Text(
+                    'Provide EITHER absolute chainage OR meterage from LCS code',
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Meterage (from LCS code)
+                  TextField(
+                    controller: _newMeterageController,
+                    decoration: InputDecoration(
+                      labelText: 'Meterage from LCS Code (m)',
+                      prefixIcon: const Icon(Icons.straighten),
+                      border: const OutlineInputBorder(),
+                      helperText: 'Distance from LCS code start (can be +/-)',
+                      suffixIcon: _calculatedChainage != null
+                          ? Icon(Icons.check_circle, color: Colors.green.shade700)
+                          : null,
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                    onChanged: (value) {
+                      if (_newLcsController.text.isNotEmpty && value.isNotEmpty) {
+                        setDialogState(() {
+                          _calculateChainageFromMeterage(_newLcsController.text, value);
+                        });
+                      } else {
+                        setDialogState(() => _calculatedChainage = null);
+                      }
+                    },
+                  ),
+                  if (_calculatedChainage != null) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.green.shade700, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Calculated Chainage: ${_calculatedChainage!.toStringAsFixed(3)}m',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green.shade900,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+
+                  // OR manual chainage
+                  TextField(
+                    controller: _newChainageController,
+                    decoration: const InputDecoration(
+                      labelText: 'OR Absolute Chainage (m)',
+                      prefixIcon: Icon(Icons.location_searching),
+                      border: OutlineInputBorder(),
+                      helperText: 'Absolute position along the track',
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    enabled: _calculatedChainage == null,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Description (optional)
+                  TextField(
+                    controller: _newDescriptionController,
+                    decoration: const InputDecoration(
+                      labelText: 'Description (optional)',
+                      prefixIcon: Icon(Icons.description),
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 2,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton.icon(
+              onPressed: () => _saveNewTrackSection(),
+              icon: const Icon(Icons.add),
+              label: const Text('Add Track Section'),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.green,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _calculateChainageFromMeterage(String lcsCode, String meterageStr) {
+    final meterage = double.tryParse(meterageStr);
+    if (meterage == null) {
+      _calculatedChainage = null;
+      return;
+    }
+
+    // Find the LCS code's base chainage
+    final lcs = _dataService.findLcsByCode(lcsCode);
+    if (lcs == null) {
+      _calculatedChainage = null;
+      return;
+    }
+
+    // Find associated track sections to get base chainage
+    final trackSections = _dataService.getTrackSectionsByLcs(lcsCode);
+    if (trackSections.isEmpty) {
+      _calculatedChainage = null;
+      return;
+    }
+
+    // Use the first track section's chainage as base and adjust by meterage
+    final baseTs = trackSections.first;
+    final baseChainage = baseTs.thalesChainage;
+    final lcsMeterageStart = baseTs.lcsMeterageStart;
+
+    // Calculate: base chainage + (meterage - lcsMeterageStart)
+    _calculatedChainage = baseChainage + (meterage - lcsMeterageStart);
+  }
+
+  Future<void> _saveNewTrackSection() async {
+    // Validation
+    if (_newTsIdController.text.length != 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Track Section ID must be exactly 5 digits'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (_newLcsController.text.isEmpty ||
+        _newStationController.text.isEmpty ||
+        _newSelectedLine == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill all required fields (*)'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Determine chainage
+    double chainage;
+    if (_calculatedChainage != null) {
+      chainage = _calculatedChainage!;
+    } else if (_newChainageController.text.isNotEmpty) {
+      chainage = double.tryParse(_newChainageController.text) ?? 0;
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please provide either meterage or absolute chainage'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      final trackSectionId = int.parse(_newTsIdController.text);
+
+      // Check if track section already exists
+      if (_allTrackSections.any((ts) => ts.trackSection == trackSectionId)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Track Section $trackSectionId already exists'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+
+      // Create new track section
+      final meterage = double.tryParse(_newMeterageController.text) ?? 0;
+      final newSection = EnhancedTrackSection(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        currentLcsCode: _newLcsController.text,
+        legacyLcsCode: _newLcsController.text,
+        legacyJnpLcsCode: _newLcsController.text,
+        roadStatus: 'User-Added',
+        operatingLineCode: _newSelectedLine ?? '',
+        operatingLine: _newSelectedLine ?? '',
+        newLongDescription: _newDescriptionController.text.isNotEmpty
+            ? _newDescriptionController.text
+            : '${_newStationController.text} - Track Section $trackSectionId',
+        newShortDescription: _newStationController.text,
+        vcc: 0,
+        thalesChainage: chainage,
+        segmentId: 0,
+        lcsMeterageStart: meterage,
+        lcsMeterageEnd: meterage + 50, // Default 50m segment
+        track: _newPlatformController.text.isNotEmpty ? int.tryParse(_newPlatformController.text) ?? 0 : 0,
+        trackSection: trackSectionId,
+        physicalAssets: const [],
+        notes: 'User-added track section',
+      );
+
+      // Save to unified data service
+      await _dataService.addUserTrackSection(newSection);
+
+      // Create station mapping
+      final mapping = LCSStationMapping(
+        lcsCode: _newLcsController.text,
+        station: _newStationController.text,
+        line: _newSelectedLine ?? '',
+        aliases: const [],
+      );
+      await _dataService.addUserStationMapping(mapping);
+
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Track Section $trackSectionId added successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Refresh data
+      await _initializeData();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error adding track section: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _removeTrackSection(EnhancedTrackSection ts) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning, color: Colors.orange),
+            SizedBox(width: 8),
+            Text('Confirm Removal'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Are you sure you want to remove this track section?'),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Track Section: ${ts.trackSection}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text('LCS Code: ${ts.currentLcsCode}'),
+                  Text('Location: ${ts.newShortDescription}'),
+                  Text('Line: ${ts.operatingLine}'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Note: Only user-added track sections can be removed. This action cannot be undone.',
+              style: TextStyle(color: Colors.red, fontSize: 12),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(context, true),
+            icon: const Icon(Icons.delete),
+            label: const Text('Remove'),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await _dataService.removeUserTrackSection(ts.trackSection);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Track Section ${ts.trackSection} removed'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+
+          // Refresh data
+          await _initializeData();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error removing track section: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -423,6 +892,13 @@ class _TrackSectionTrainingScreenState extends State<TrackSectionTrainingScreen>
           _buildStatsBar(),
           Expanded(child: _buildTrackSectionsList()),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _addNewTrackSection,
+        icon: const Icon(Icons.add),
+        label: const Text('Add Track Section'),
+        backgroundColor: Colors.green,
+        tooltip: 'Add new track section',
       ),
     );
   }
@@ -692,6 +1168,11 @@ class _TrackSectionTrainingScreenState extends State<TrackSectionTrainingScreen>
                     icon: const Icon(Icons.edit, size: 20),
                     onPressed: () => _editTrackSection(ts),
                     tooltip: 'Edit',
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, size: 20, color: Colors.red),
+                    onPressed: () => _removeTrackSection(ts),
+                    tooltip: 'Remove',
                   ),
                 ],
               ),

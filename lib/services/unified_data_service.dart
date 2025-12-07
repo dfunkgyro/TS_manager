@@ -424,6 +424,13 @@ class UnifiedDataService {
     await _saveUserData();
   }
 
+  /// Remove user-defined track section
+  Future<void> removeUserTrackSection(int trackSectionId) async {
+    _userTrackSections.removeWhere((ts) => ts.trackSection == trackSectionId);
+    _buildIndices();
+    await _saveUserData();
+  }
+
   /// Link LCS code to track section IDs
   Future<void> linkLcsToTrackSections(String lcsCode, List<int> tsIds) async {
     _userLcsToTrackSections[lcsCode] = tsIds;
