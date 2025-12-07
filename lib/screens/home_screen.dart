@@ -197,6 +197,24 @@ class HomeScreen extends StatelessWidget {
                       },
                     ),
                     NavigationCard(
+                      title: '⚡ Batch Entry',
+                      subtitle: 'Speed up data entry',
+                      icon: Icons.fast_forward,
+                      color: Colors.blue,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/batch-entry');
+                      },
+                    ),
+                    NavigationCard(
+                      title: 'Grouping Manager',
+                      subtitle: 'Manage TSR groupings',
+                      icon: Icons.group_work,
+                      color: Colors.deepOrange,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/grouping-management');
+                      },
+                    ),
+                    NavigationCard(
                       title: 'Data Export',
                       subtitle: 'Export results',
                       icon: Icons.download,

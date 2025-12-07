@@ -15,9 +15,12 @@ import 'package:track_sections_manager/screens/comprehensive_finder_screen.dart'
 import 'package:track_sections_manager/screens/unified_search_screen.dart';
 import 'package:track_sections_manager/screens/track_section_training_screen.dart';
 import 'package:track_sections_manager/screens/activity_logger_screen.dart';
+import 'package:track_sections_manager/screens/batch_entry_screen.dart';
+import 'package:track_sections_manager/screens/grouping_management_screen.dart';
 import 'package:track_sections_manager/services/data_service.dart';
 import 'package:track_sections_manager/services/enhanced_data_service.dart';
 import 'package:track_sections_manager/services/supabase_service.dart';
+import 'package:track_sections_manager/services/app_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,12 +45,22 @@ void main() async {
 
   // Initialize services
   try {
+    // Initialize AppConfig first
+    await AppConfig().initialize();
+
+    // Then initialize other services
     await Future.wait([
       DataService().initialize(),
       EnhancedDataService().initialize(),
-      // Uncomment when you have your Supabase credentials
-      // SupabaseService().initialize(),
     ]);
+
+    // Initialize Supabase (will work if credentials are configured in .env)
+    try {
+      await SupabaseService().initialize();
+    } catch (e) {
+      debugPrint('Supabase not configured or failed to initialize: $e');
+      debugPrint('App will continue in offline mode');
+    }
   } catch (e) {
     debugPrint('Error initializing services: $e');
   }
@@ -143,6 +156,8 @@ class TrackSectionsApp extends StatelessWidget {
         '/unified-search': (context) => const UnifiedSearchScreen(),
         '/track-section-training': (context) => const TrackSectionTrainingScreen(),
         '/activity-logger': (context) => const ActivityLoggerScreen(),
+        '/batch-entry': (context) => const BatchEntryScreen(),
+        '/grouping-management': (context) => const GroupingManagementScreen(),
       },
       debugShowCheckedModeBanner: false,
     );

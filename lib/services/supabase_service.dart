@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/track_data.dart';
 import '../models/enhanced_track_data.dart';
+import 'app_config.dart';
 
 class SupabaseService {
   static final SupabaseService _instance = SupabaseService._internal();
@@ -11,10 +12,6 @@ class SupabaseService {
 
   SupabaseClient? _client;
   User? _currentUser;
-
-  // Configuration - These should be stored in environment variables
-  static const String supabaseUrl = 'YOUR_SUPABASE_URL';
-  static const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
 
   bool get isInitialized => _client != null;
   bool get isAuthenticated => _currentUser != null;
@@ -29,9 +26,17 @@ class SupabaseService {
   /// Initialize Supabase connection
   Future<void> initialize() async {
     try {
+      // Get configuration from AppConfig
+      final config = AppConfig();
+
+      if (!config.hasSupabaseConfig) {
+        debugPrint('Supabase configuration not found. App will run in offline mode.');
+        return;
+      }
+
       await Supabase.initialize(
-        url: supabaseUrl,
-        anonKey: supabaseAnonKey,
+        url: config.supabaseUrl!,
+        anonKey: config.supabaseAnonKey!,
         authOptions: const FlutterAuthClientOptions(
           authFlowType: AuthFlowType.pkce,
         ),
@@ -65,7 +70,8 @@ class SupabaseService {
       debugPrint('Supabase initialized successfully');
     } catch (e) {
       debugPrint('Error initializing Supabase: $e');
-      rethrow;
+      debugPrint('App will continue in offline mode');
+      // Don't rethrow - allow app to continue in offline mode
     }
   }
 
@@ -510,5 +516,489 @@ class SupabaseService {
   /// Unsubscribe from a channel
   Future<void> unsubscribeChannel(RealtimeChannel channel) async {
     await client.removeChannel(channel);
+  }
+
+  // ============= BATCH OPERATIONS =============
+
+  /// Create a new batch operation
+  Future<String?> createBatchOperation({
+    required int startTrackSection,
+    required int endTrackSection,
+    required double startChainage,
+    required double endChainage,
+    required String lcsCode,
+    required String operatingLine,
+    required String roadDirection,
+    String? station,
+    String? vcc,
+  }) async {
+    if (!isInitialized) return null;
+
+    try {
+      final response = await client
+          .from('batch_operations')
+          .insert({
+            'operation_type': 'track_section_batch_insert',
+            'status': 'pending',
+            'start_track_section': startTrackSection,
+            'end_track_section': endTrackSection,
+            'start_chainage': startChainage,
+            'end_chainage': endChainage,
+            'lcs_code': lcsCode,
+            'station': station,
+            'operating_line': operatingLine,
+            'road_direction': roadDirection,
+            'vcc': vcc,
+            'user_id': _currentUser?.id,
+          })
+          .select('id')
+          .single();
+
+      return response['id'] as String;
+    } catch (e) {
+      debugPrint('Error creating batch operation: $e');
+      return null;
+    }
+  }
+
+  /// Update batch operation status
+  Future<bool> updateBatchOperationStatus(
+    String batchId,
+    String status, {
+    int? totalItems,
+    int? successfulItems,
+    int? failedItems,
+    int? conflictedItems,
+    Map<String, dynamic>? conflictsData,
+    String? errorLog,
+  }) async {
+    if (!isInitialized) return false;
+
+    try {
+      final updates = <String, dynamic>{'status': status};
+
+      if (totalItems != null) updates['total_items'] = totalItems;
+      if (successfulItems != null) updates['successful_items'] = successfulItems;
+      if (failedItems != null) updates['failed_items'] = failedItems;
+      if (conflictedItems != null) updates['conflicted_items'] = conflictedItems;
+      if (conflictsData != null) updates['conflicts_data'] = conflictsData;
+      if (errorLog != null) updates['error_log'] = errorLog;
+
+      if (status == 'completed' || status == 'failed' || status == 'partial') {
+        updates['completed_at'] = DateTime.now().toIso8601String();
+      }
+
+      await client
+          .from('batch_operations')
+          .update(updates)
+          .eq('id', batchId);
+
+      return true;
+    } catch (e) {
+      debugPrint('Error updating batch operation: $e');
+      return false;
+    }
+  }
+
+  /// Get batch operation by ID
+  Future<Map<String, dynamic>?> getBatchOperation(String batchId) async {
+    if (!isInitialized) return null;
+
+    try {
+      final response = await client
+          .from('batch_operations')
+          .select()
+          .eq('id', batchId)
+          .single();
+
+      return response;
+    } catch (e) {
+      debugPrint('Error fetching batch operation: $e');
+      return null;
+    }
+  }
+
+  /// Get recent batch operations
+  Future<List<Map<String, dynamic>>> getRecentBatchOperations({int limit = 20}) async {
+    if (!isInitialized) return [];
+
+    try {
+      final response = await client
+          .from('batch_operations')
+          .select()
+          .order('created_at', ascending: false)
+          .limit(limit);
+
+      return (response as List).cast<Map<String, dynamic>>();
+    } catch (e) {
+      debugPrint('Error fetching batch operations: $e');
+      return [];
+    }
+  }
+
+  /// Batch insert track sections
+  Future<bool> batchInsertTrackSections(
+    String batchId,
+    List<Map<String, dynamic>> trackSections,
+  ) async {
+    if (!isInitialized) return false;
+
+    try {
+      // Add batch_operation_id to each track section
+      final sectionsWithBatchId = trackSections.map((section) {
+        return {...section, 'batch_operation_id': batchId, 'data_source': 'batch'};
+      }).toList();
+
+      await client.from('track_sections').insert(sectionsWithBatchId);
+
+      return true;
+    } catch (e) {
+      debugPrint('Error batch inserting track sections: $e');
+      return false;
+    }
+  }
+
+  /// Check for track section conflicts
+  Future<Map<String, dynamic>?> checkTrackSectionConflict(
+    int trackSectionNumber,
+    String operatingLine,
+    String roadDirection,
+  ) async {
+    if (!isInitialized) return null;
+
+    try {
+      final response = await client
+          .from('track_sections')
+          .select()
+          .eq('track_section_number', trackSectionNumber)
+          .eq('operating_line', operatingLine)
+          .eq('road_direction', roadDirection)
+          .maybeSingle();
+
+      return response;
+    } catch (e) {
+      debugPrint('Error checking conflict: $e');
+      return null;
+    }
+  }
+
+  // ============= TEMPORARY SPEED RESTRICTIONS (TSR) =============
+
+  /// Create a new TSR
+  Future<Map<String, dynamic>?> createTSR({
+    required String tsrNumber,
+    required String lcsCode,
+    required double startMeterage,
+    required double endMeterage,
+    required String operatingLine,
+    required int restrictedSpeedMph,
+    required DateTime effectiveFrom,
+    required String reason,
+    String? tsrName,
+    String? roadDirection,
+    int? normalSpeedMph,
+    DateTime? effectiveUntil,
+    String? description,
+    String? requestedBy,
+    String? approvedBy,
+    List<int>? affectedTrackSections,
+  }) async {
+    if (!isInitialized) return null;
+
+    try {
+      final response = await client
+          .from('temporary_speed_restrictions')
+          .insert({
+            'tsr_number': tsrNumber,
+            'tsr_name': tsrName,
+            'lcs_code': lcsCode,
+            'start_meterage': startMeterage,
+            'end_meterage': endMeterage,
+            'operating_line': operatingLine,
+            'road_direction': roadDirection,
+            'normal_speed_mph': normalSpeedMph,
+            'restricted_speed_mph': restrictedSpeedMph,
+            'effective_from': effectiveFrom.toIso8601String(),
+            'effective_until': effectiveUntil?.toIso8601String(),
+            'status': 'planned',
+            'reason': reason,
+            'description': description,
+            'requested_by': requestedBy,
+            'approved_by': approvedBy,
+            'affected_track_sections': affectedTrackSections,
+          })
+          .select()
+          .single();
+
+      return response;
+    } catch (e) {
+      debugPrint('Error creating TSR: $e');
+      return null;
+    }
+  }
+
+  /// Get TSRs by LCS code and meterage
+  Future<List<Map<String, dynamic>>> getTSRsByLocation(
+    String lcsCode,
+    double meterage, {
+    double tolerance = 100,
+  }) async {
+    if (!isInitialized) return [];
+
+    try {
+      final response = await client
+          .from('temporary_speed_restrictions')
+          .select()
+          .eq('lcs_code', lcsCode)
+          .gte('end_meterage', meterage - tolerance)
+          .lte('start_meterage', meterage + tolerance)
+          .order('start_meterage');
+
+      return (response as List).cast<Map<String, dynamic>>();
+    } catch (e) {
+      debugPrint('Error fetching TSRs by location: $e');
+      return [];
+    }
+  }
+
+  /// Get active TSRs
+  Future<List<Map<String, dynamic>>> getActiveTSRs({String? operatingLine}) async {
+    if (!isInitialized) return [];
+
+    try {
+      var query = client
+          .from('temporary_speed_restrictions')
+          .select()
+          .eq('status', 'active')
+          .lte('effective_from', DateTime.now().toIso8601String())
+          .order('operating_line');
+
+      if (operatingLine != null) {
+        query = query.eq('operating_line', operatingLine);
+      }
+
+      final response = await query;
+      return (response as List).cast<Map<String, dynamic>>();
+    } catch (e) {
+      debugPrint('Error fetching active TSRs: $e');
+      return [];
+    }
+  }
+
+  /// Update TSR status
+  Future<bool> updateTSRStatus(String tsrId, String status) async {
+    if (!isInitialized) return false;
+
+    try {
+      await client
+          .from('temporary_speed_restrictions')
+          .update({'status': status})
+          .eq('id', tsrId);
+
+      return true;
+    } catch (e) {
+      debugPrint('Error updating TSR status: $e');
+      return false;
+    }
+  }
+
+  /// Delete TSR
+  Future<bool> deleteTSR(String tsrId) async {
+    if (!isInitialized) return false;
+
+    try {
+      await client
+          .from('temporary_speed_restrictions')
+          .delete()
+          .eq('id', tsrId);
+
+      return true;
+    } catch (e) {
+      debugPrint('Error deleting TSR: $e');
+      return false;
+    }
+  }
+
+  // ============= TRACK SECTION GROUPINGS =============
+
+  /// Get or create a grouping
+  Future<Map<String, dynamic>?> getOrCreateGrouping({
+    required String lcsCode,
+    required double meterage,
+    required String operatingLine,
+    String? roadDirection,
+    double tolerance = 10,
+  }) async {
+    if (!isInitialized) return null;
+
+    try {
+      // Try to find existing grouping
+      final existing = await client
+          .from('track_section_groupings')
+          .select()
+          .eq('lcs_code', lcsCode)
+          .eq('operating_line', operatingLine)
+          .gte('meterage_from_lcs', meterage - tolerance)
+          .lte('meterage_from_lcs', meterage + tolerance)
+          .maybeSingle();
+
+      if (existing != null) {
+        return existing;
+      }
+
+      // Find track sections in this range
+      final trackSections = await client
+          .from('track_sections')
+          .select('track_section_number')
+          .eq('lcs_code', lcsCode)
+          .eq('operating_line', operatingLine)
+          .gte('lcs_meterage', meterage - tolerance)
+          .lte('lcs_meterage', meterage + tolerance);
+
+      final trackSectionNumbers = (trackSections as List)
+          .map((ts) => ts['track_section_number'] as int)
+          .toList();
+
+      // Create new grouping
+      final response = await client
+          .from('track_section_groupings')
+          .insert({
+            'lcs_code': lcsCode,
+            'meterage_from_lcs': meterage,
+            'operating_line': operatingLine,
+            'road_direction': roadDirection,
+            'track_section_numbers': trackSectionNumbers,
+            'track_section_count': trackSectionNumbers.length,
+            'auto_generated': true,
+          })
+          .select()
+          .single();
+
+      return response;
+    } catch (e) {
+      debugPrint('Error getting/creating grouping: $e');
+      return null;
+    }
+  }
+
+  /// Get groupings by LCS code
+  Future<List<Map<String, dynamic>>> getGroupingsByLCS(String lcsCode) async {
+    if (!isInitialized) return [];
+
+    try {
+      final response = await client
+          .from('track_section_groupings')
+          .select()
+          .eq('lcs_code', lcsCode)
+          .order('meterage_from_lcs');
+
+      return (response as List).cast<Map<String, dynamic>>();
+    } catch (e) {
+      debugPrint('Error fetching groupings: $e');
+      return [];
+    }
+  }
+
+  /// Update grouping track sections
+  Future<bool> updateGroupingTrackSections(
+    String groupingId,
+    List<int> trackSectionNumbers,
+  ) async {
+    if (!isInitialized) return false;
+
+    try {
+      await client
+          .from('track_section_groupings')
+          .update({
+            'track_section_numbers': trackSectionNumbers,
+            'track_section_count': trackSectionNumbers.length,
+            'verified': true,
+            'auto_generated': false,
+          })
+          .eq('id', groupingId);
+
+      return true;
+    } catch (e) {
+      debugPrint('Error updating grouping: $e');
+      return false;
+    }
+  }
+
+  /// Add track section to grouping
+  Future<bool> addTrackSectionToGrouping(
+    String groupingId,
+    int trackSectionNumber,
+  ) async {
+    if (!isInitialized) return false;
+
+    try {
+      // Get current grouping
+      final grouping = await client
+          .from('track_section_groupings')
+          .select('track_section_numbers')
+          .eq('id', groupingId)
+          .single();
+
+      final currentNumbers = (grouping['track_section_numbers'] as List).cast<int>();
+
+      if (!currentNumbers.contains(trackSectionNumber)) {
+        currentNumbers.add(trackSectionNumber);
+        currentNumbers.sort();
+
+        return await updateGroupingTrackSections(groupingId, currentNumbers);
+      }
+
+      return true;
+    } catch (e) {
+      debugPrint('Error adding track section to grouping: $e');
+      return false;
+    }
+  }
+
+  /// Remove track section from grouping
+  Future<bool> removeTrackSectionFromGrouping(
+    String groupingId,
+    int trackSectionNumber,
+  ) async {
+    if (!isInitialized) return false;
+
+    try {
+      // Get current grouping
+      final grouping = await client
+          .from('track_section_groupings')
+          .select('track_section_numbers')
+          .eq('id', groupingId)
+          .single();
+
+      final currentNumbers = (grouping['track_section_numbers'] as List).cast<int>();
+
+      if (currentNumbers.contains(trackSectionNumber)) {
+        currentNumbers.remove(trackSectionNumber);
+
+        return await updateGroupingTrackSections(groupingId, currentNumbers);
+      }
+
+      return true;
+    } catch (e) {
+      debugPrint('Error removing track section from grouping: $e');
+      return false;
+    }
+  }
+
+  /// Delete grouping
+  Future<bool> deleteGrouping(String groupingId) async {
+    if (!isInitialized) return false;
+
+    try {
+      await client
+          .from('track_section_groupings')
+          .delete()
+          .eq('id', groupingId);
+
+      return true;
+    } catch (e) {
+      debugPrint('Error deleting grouping: $e');
+      return false;
+    }
   }
 }
