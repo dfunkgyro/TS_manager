@@ -188,6 +188,15 @@ class HomeScreen extends StatelessWidget {
                       },
                     ),
                     NavigationCard(
+                      title: 'Track Section Training',
+                      subtitle: 'Train & link data',
+                      icon: Icons.school,
+                      color: Colors.purple,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/track-section-training');
+                      },
+                    ),
+                    NavigationCard(
                       title: 'Data Export',
                       subtitle: 'Export results',
                       icon: Icons.download,
