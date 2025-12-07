@@ -4,11 +4,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:track_sections_manager/services/unified_data_service.dart';
 
 /// AI Service for enhanced search and data connections
+/// Supports both OpenAI and DeepSeek AI
 class AIService {
   static AIService? _instance;
-  String? _apiKey;
+  String? _openAiKey;
+  String? _deepseekKey;
   bool _isConnected = false;
   String? _lastError;
+  String _provider = 'none'; // 'openai', 'deepseek', or 'none'
 
   AIService._();
 
@@ -19,46 +22,76 @@ class AIService {
 
   bool get isConnected => _isConnected;
   String? get lastError => _lastError;
+  String get provider => _provider;
 
-  /// Initialize AI service with API key from .env
+  /// Initialize AI service with API keys from .env
   Future<void> initialize() async {
     try {
       await dotenv.load(fileName: "assets/.env");
-      _apiKey = dotenv.env['OPENAI_API_KEY'];
-      
-      if (_apiKey == null || _apiKey!.isEmpty) {
-        _lastError = 'OPENAI_API_KEY not found in .env file';
-        _isConnected = false;
-        return;
+      _openAiKey = dotenv.env['OPENAI_API_KEY'];
+      _deepseekKey = dotenv.env['DEEPSEEK_API_KEY'];
+
+      // Try OpenAI first, then DeepSeek
+      if (_openAiKey != null && _openAiKey!.isNotEmpty && !_openAiKey!.contains('your_')) {
+        _provider = 'openai';
+        await _testConnection();
+        if (_isConnected) return;
       }
-      
-      // Test connection
-      await _testConnection();
+
+      if (_deepseekKey != null && _deepseekKey!.isNotEmpty && !_deepseekKey!.contains('your_')) {
+        _provider = 'deepseek';
+        await _testConnection();
+        if (_isConnected) return;
+      }
+
+      _lastError = 'No valid AI API keys found in .env file';
+      _isConnected = false;
+      _provider = 'none';
     } catch (e) {
       _lastError = 'Failed to load .env file: $e';
       _isConnected = false;
+      _provider = 'none';
     }
   }
 
   Future<void> _testConnection() async {
     try {
-      final response = await http.post(
-        Uri.parse('https://api.openai.com/v1/models'),
-        headers: {
-          'Authorization': 'Bearer $_apiKey',
-          'Content-Type': 'application/json',
-        },
-      );
-      
-      _isConnected = response.statusCode == 200;
-      if (!_isConnected) {
-        _lastError = 'OpenAI API returned status ${response.statusCode}';
+      if (_provider == 'openai') {
+        final response = await http.get(
+          Uri.parse('https://api.openai.com/v1/models'),
+          headers: {
+            'Authorization': 'Bearer $_openAiKey',
+          },
+        ).timeout(const Duration(seconds: 5));
+
+        _isConnected = response.statusCode == 200;
+        if (!_isConnected) {
+          _lastError = 'OpenAI API returned status ${response.statusCode}';
+        }
+      } else if (_provider == 'deepseek') {
+        final response = await http.get(
+          Uri.parse('https://api.deepseek.com/models'),
+          headers: {
+            'Authorization': 'Bearer $_deepseekKey',
+          },
+        ).timeout(const Duration(seconds: 5));
+
+        _isConnected = response.statusCode == 200;
+        if (!_isConnected) {
+          _lastError = 'DeepSeek API returned status ${response.statusCode}';
+        }
       }
     } catch (e) {
       _isConnected = false;
       _lastError = 'Connection test failed: $e';
     }
   }
+
+  String get _apiKey => _provider == 'openai' ? _openAiKey ?? '' : _deepseekKey ?? '';
+  String get _baseUrl => _provider == 'openai'
+      ? 'https://api.openai.com/v1'
+      : 'https://api.deepseek.com';
+  String get _model => _provider == 'openai' ? 'gpt-4' : 'deepseek-chat';
 
   /// Enhanced search with AI assistance
   Future<String> enhancedSearch({
@@ -265,28 +298,34 @@ Respond with JSON containing:
 }
 ''';
 
+      final requestBody = {
+        'model': _model,
+        'messages': [
+          {
+            'role': 'system',
+            'content': 'You are a railway track sections expert AI assistant. You understand LCS codes, chainage, meterage, track sections, stations, lines, and districts. Process queries intelligently and perform calculations accurately.',
+          },
+          {
+            'role': 'user',
+            'content': prompt,
+          },
+        ],
+        'temperature': 0.1,
+        'max_tokens': 2000,
+      };
+
+      // Only OpenAI supports response_format currently
+      if (_provider == 'openai') {
+        requestBody['response_format'] = {'type': 'json_object'};
+      }
+
       final response = await http.post(
-        Uri.parse('https://api.openai.com/v1/chat/completions'),
+        Uri.parse('$_baseUrl/chat/completions'),
         headers: {
           'Authorization': 'Bearer $_apiKey',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({
-          'model': 'gpt-4',
-          'messages': [
-            {
-              'role': 'system',
-              'content': 'You are a railway track sections expert AI assistant. You understand LCS codes, chainage, meterage, track sections, stations, lines, and districts. Process queries intelligently and perform calculations accurately.',
-            },
-            {
-              'role': 'user',
-              'content': prompt,
-            },
-          ],
-          'temperature': 0.1,
-          'max_tokens': 2000,
-          'response_format': {'type': 'json_object'},
-        }),
+        body: jsonEncode(requestBody),
       );
 
       if (response.statusCode == 200) {

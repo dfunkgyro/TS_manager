@@ -598,8 +598,13 @@ class _UnifiedSearchScreenState extends State<UnifiedSearchScreen> with SingleTi
   }
 
   Widget _buildConnectionIndicator(String label, bool connected, IconData icon, Color color) {
+    // Show AI provider if it's the AI indicator
+    final tooltipMessage = label == 'AI' && connected
+        ? 'AI: Connected via ${_aiService.provider.toUpperCase()}'
+        : '$label: ${connected ? "Connected" : "Disconnected"}';
+
     return Tooltip(
-      message: '$label: ${connected ? "Connected" : "Disconnected"}',
+      message: tooltipMessage,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
