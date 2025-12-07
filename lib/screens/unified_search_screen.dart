@@ -1082,7 +1082,7 @@ class _UnifiedSearchScreenState extends State<UnifiedSearchScreen> with SingleTi
         color = Colors.orange;
         break;
       case ResultType.platform:
-        icon = Icons.platform;
+        icon = Icons.view_list;
         color = Colors.purple;
         break;
     }
@@ -1279,7 +1279,7 @@ class _UnifiedSearchScreenState extends State<UnifiedSearchScreen> with SingleTi
       case ResultType.station:
         return Icons.location_on;
       case ResultType.platform:
-        return Icons.platform;
+        return Icons.view_list;
     }
   }
 
@@ -1353,7 +1353,7 @@ class _UnifiedSearchScreenState extends State<UnifiedSearchScreen> with SingleTi
               const SizedBox(height: 16),
               _buildStatRow('LCS Codes', _allKnownLcsCodes.length, Icons.code, Colors.blue),
               _buildStatRow('Stations', _allKnownStations.length, Icons.location_on, Colors.green),
-              _buildStatRow('Lines', _allKnownLines.length, Icons.train, Icons.orange),
+              _buildStatRow('Lines', _allKnownLines.length, Icons.train, Colors.orange),
               _buildStatRow('Track Sections', _dataService.allTrackSections.length, Icons.route, Colors.purple),
             ],
           ),
