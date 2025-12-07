@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:track_sections_manager/models/enhanced_lcs_ts_models.dart';
-import 'package:track_sections_manager/models/enhanced_track_data.dart';
+import 'package:track_sections_manager/models/enhanced_track_data.dart' show LCSStationMapping;
 import 'package:track_sections_manager/services/unified_data_service.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:convert';
