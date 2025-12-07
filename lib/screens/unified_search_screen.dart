@@ -509,7 +509,14 @@ class _UnifiedSearchScreenState extends State<UnifiedSearchScreen> with SingleTi
             Icons.storage,
             Colors.green,
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 8),
+          // Activity Logger Button
+          IconButton(
+            icon: const Icon(Icons.bug_report),
+            onPressed: () => Navigator.pushNamed(context, '/activity-logger'),
+            tooltip: 'Activity Logger',
+          ),
+          const SizedBox(width: 8),
           // Sidebar toggles
           IconButton(
             icon: Icon(_leftSidebarOpen ? Icons.chevron_left : Icons.menu_open),

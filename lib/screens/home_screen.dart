@@ -205,6 +205,15 @@ class HomeScreen extends StatelessWidget {
                         _showExportDialog(context);
                       },
                     ),
+                    NavigationCard(
+                      title: 'Activity Logger',
+                      subtitle: 'Debug & monitor',
+                      icon: Icons.bug_report,
+                      color: Colors.deepPurple,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/activity-logger');
+                      },
+                    ),
                   ],
                 ),
               ),
