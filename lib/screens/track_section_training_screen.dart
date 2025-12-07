@@ -686,7 +686,7 @@ class _TrackSectionTrainingScreenState extends State<TrackSectionTrainingScreen>
     }
 
     try {
-      final trackSectionId = int.parse(_newTsIdController.text);
+      final trackSectionId = _newTsIdController.text;
 
       // Check if track section already exists
       if (_allTrackSections.any((ts) => ts.trackSection == trackSectionId)) {
@@ -715,12 +715,12 @@ class _TrackSectionTrainingScreenState extends State<TrackSectionTrainingScreen>
         newShortDescription: _newStationController.text,
         vcc: 0,
         thalesChainage: chainage,
-        segmentId: 0,
+        segmentId: '0',
         lcsMeterageStart: meterage,
         lcsMeterageEnd: meterage + 50, // Default 50m segment
-        track: _newPlatformController.text.isNotEmpty ? int.tryParse(_newPlatformController.text) ?? 0 : 0,
+        track: _newPlatformController.text.isNotEmpty ? _newPlatformController.text : '0',
         trackSection: trackSectionId,
-        physicalAssets: const [],
+        physicalAssets: null,
         notes: 'User-added track section',
       );
 

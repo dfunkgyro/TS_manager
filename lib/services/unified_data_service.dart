@@ -425,7 +425,7 @@ class UnifiedDataService {
   }
 
   /// Remove user-defined track section
-  Future<void> removeUserTrackSection(int trackSectionId) async {
+  Future<void> removeUserTrackSection(String trackSectionId) async {
     _userTrackSections.removeWhere((ts) => ts.trackSection == trackSectionId);
     _buildIndices();
     await _saveUserData();
