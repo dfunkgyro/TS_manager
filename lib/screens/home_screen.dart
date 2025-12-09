@@ -215,10 +215,19 @@ class HomeScreen extends StatelessWidget {
                       },
                     ),
                     NavigationCard(
+                      title: 'TSR Dashboard',
+                      subtitle: 'Active speed restrictions',
+                      icon: Icons.warning_amber_rounded,
+                      color: Colors.red,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/tsr-dashboard');
+                      },
+                    ),
+                    NavigationCard(
                       title: 'Data Export',
                       subtitle: 'Export results',
                       icon: Icons.download,
-                      color: Colors.red,
+                      color: Colors.brown,
                       onTap: () {
                         _showExportDialog(context);
                       },
@@ -230,6 +239,15 @@ class HomeScreen extends StatelessWidget {
                       color: Colors.deepPurple,
                       onTap: () {
                         Navigator.pushNamed(context, '/activity-logger');
+                      },
+                    ),
+                    NavigationCard(
+                      title: 'Theme Settings',
+                      subtitle: 'Dark mode & colors',
+                      icon: Icons.palette,
+                      color: Colors.indigo,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/theme-settings');
                       },
                     ),
                   ],
