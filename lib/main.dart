@@ -21,6 +21,7 @@ import 'package:track_sections_manager/screens/grouping_management_screen.dart';
 import 'package:track_sections_manager/screens/tsr_creation_wizard_screen.dart';
 import 'package:track_sections_manager/screens/active_tsr_dashboard_screen.dart';
 import 'package:track_sections_manager/screens/theme_settings_screen.dart';
+import 'package:track_sections_manager/screens/ai_chat_screen.dart';
 import 'package:track_sections_manager/services/data_service.dart';
 import 'package:track_sections_manager/services/enhanced_data_service.dart';
 import 'package:track_sections_manager/services/supabase_service.dart';
@@ -107,6 +108,7 @@ class TrackSectionsApp extends StatelessWidget {
               '/tsr-creation': (context) => const TSRCreationWizardScreen(),
               '/tsr-dashboard': (context) => const ActiveTSRDashboardScreen(),
               '/theme-settings': (context) => const ThemeSettingsScreen(),
+              '/ai-chat': (context) => const AIChatScreen(),
             },
             debugShowCheckedModeBanner: false,
           );
