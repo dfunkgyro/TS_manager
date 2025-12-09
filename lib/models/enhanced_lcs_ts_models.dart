@@ -1,4 +1,5 @@
 /// Enhanced data models incorporating LCS_Map XML and comprehensive track section data
+import 'track_data.dart';
 
 class LcsStationMapping {
   final String lcsCode;
@@ -113,6 +114,29 @@ class EnhancedTrackSection {
         'Physical assets': physicalAssets,
         'Notes': notes,
       };
+
+  /// Convert EnhancedTrackSection to TrackSection
+  TrackSection toTrackSection() {
+    return TrackSection(
+      lcsCode: currentLcsCode,
+      legacyLcsCode: legacyLcsCode,
+      legacyJnpLcsCode: legacyJnpLcsCode ?? '',
+      roadStatus: roadStatus,
+      operatingLineCode: operatingLineCode,
+      operatingLine: operatingLine,
+      newLongDescription: newLongDescription,
+      newShortDescription: newShortDescription,
+      vcc: vcc.toString(),
+      thalesChainage: thalesChainage.toString(),
+      segmentId: segmentId,
+      lcsMeterageStart: lcsMeterageStart,
+      lcsMeterageEnd: lcsMeterageEnd,
+      track: track,
+      trackSection: trackSection,
+      physicalAssets: physicalAssets ?? '',
+      notes: notes ?? '',
+    );
+  }
 
   int get trackSectionId => int.tryParse(trackSection) ?? 0;
 }
