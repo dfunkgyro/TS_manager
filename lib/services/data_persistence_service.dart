@@ -58,6 +58,13 @@ class DataPersistenceService {
     await prefs.setString(_trackSectionsKey, json.encode(jsonList));
   }
 
+  /// Add a single user track section
+  Future<void> addUserTrackSection(TrackSection trackSection) async {
+    final existing = await loadTrackSections();
+    existing.add(trackSection);
+    await saveTrackSections(existing);
+  }
+
   /// Load custom track sections
   Future<List<TrackSection>> loadTrackSections() async {
     final prefs = await SharedPreferences.getInstance();

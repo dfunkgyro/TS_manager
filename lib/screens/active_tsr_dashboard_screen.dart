@@ -528,12 +528,13 @@ class _ActiveTSRDashboardScreenState extends State<ActiveTSRDashboardScreen> {
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     );
                   }).toList()
-                    ..add(
-                      if (tsr.affectedTrackSections.length > 5)
-                        Chip(
-                          label: Text('+${tsr.affectedTrackSections.length - 5} more'),
-                          visualDensity: VisualDensity.compact,
-                        ),
+                    ..addAll(
+                      tsr.affectedTrackSections.length > 5
+                        ? [Chip(
+                            label: Text('+${tsr.affectedTrackSections.length - 5} more'),
+                            visualDensity: VisualDensity.compact,
+                          )]
+                        : [],
                     ),
                 ),
               ],
