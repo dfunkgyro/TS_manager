@@ -623,7 +623,7 @@ class _BatchEntryScreenState extends State<BatchEntryScreen> {
       );
 
       // Check conflicts
-      final existingTrackSections = _dataService.getAllTrackSections();
+      final existingTrackSections = _dataService.allTrackSections;
       final conflicts = await _batchService.checkConflicts(
         generatedSections: sections,
         operatingLine: _selectedLine!,
@@ -667,7 +667,7 @@ class _BatchEntryScreenState extends State<BatchEntryScreen> {
       final startChainage = double.parse(_startChainageController.text);
       final endChainage = double.parse(_endChainageController.text);
 
-      final existingTrackSections = _dataService.getAllTrackSections();
+      final existingTrackSections = _dataService.allTrackSections;
 
       final batchId = await _batchService.executeBatchOperation(
         startTrackSection: startTS,

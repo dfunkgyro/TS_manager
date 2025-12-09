@@ -62,7 +62,7 @@ class AppConfig {
         final value = parts.sublist(1).join('=').trim();
 
         // Remove quotes if present
-        final cleanValue = value.replaceAll(RegExp(r'^["\']|["\']$'), '');
+        final cleanValue = value.replaceAll(RegExp(r'''^["']|["']$'''), '');
 
         _setConfigValue(key, cleanValue);
       }

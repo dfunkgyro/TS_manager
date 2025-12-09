@@ -1,7 +1,7 @@
 // services/theme_service.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Theme mode options
 enum AppThemeMode {
@@ -136,7 +136,7 @@ class ThemeService extends ChangeNotifier {
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -198,7 +198,7 @@ class ThemeService extends ChangeNotifier {
         backgroundColor: isOLED ? Colors.black : const Color(0xFF1E3A8A),
         foregroundColor: Colors.white,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 4,
         color: surfaceColor,
         shape: RoundedRectangleBorder(
@@ -232,7 +232,7 @@ class ThemeService extends ChangeNotifier {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: primaryColor.withOpacity(0.2),
-        labelStyle: TextStyle(color: primaryColor.shade200),
+        labelStyle: TextStyle(color: primaryColor.withOpacity(0.8)),
       ),
     );
   }

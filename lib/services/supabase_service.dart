@@ -770,14 +770,13 @@ class SupabaseService {
           .from('temporary_speed_restrictions')
           .select()
           .eq('status', 'active')
-          .lte('effective_from', DateTime.now().toIso8601String())
-          .order('operating_line');
+          .lte('effective_from', DateTime.now().toIso8601String());
 
       if (operatingLine != null) {
         query = query.eq('operating_line', operatingLine);
       }
 
-      final response = await query;
+      final response = await query.order('operating_line');
       return (response as List).cast<Map<String, dynamic>>();
     } catch (e) {
       debugPrint('Error fetching active TSRs: $e');
